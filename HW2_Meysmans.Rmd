@@ -1,0 +1,71 @@
+---
+title: Statistical Inference - Homework 2
+date: April 18, 2022
+author: Dylan Meysmans (02113915)
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(MASS)
+library(testforDEP)
+data(LSAT)
+```
+
+1.  (a)
+
+```{r 1a}
+cor(LSAT$LSAT, LSAT$GPA)
+```
+
+(b)
+
+```{r 1b}
+set.seed(12345)
+B <- 1000
+cor.bootstrap <- vector(mode = "numeric", length = B)
+
+for (i in 1:B) {
+    j <- sample(1:dim(LSAT)[1], replace = TRUE)
+    cor.bootstrap[i] <- cor(LSAT$LSAT[j], LSAT$GPA[j])
+}
+
+sd(cor.bootstrap)
+hist(cor.bootstrap)
+```
+
+(c)
+
+```{r 1c}
+set.seed(12345)
+B <- 1000
+cor.bootstrap <- vector(mode = "numeric", length = B)
+lsat.mean.estimate <- mean(LSAT$LSAT)
+lsat.sd.estimate <- sd(LSAT$LSAT)
+gpa.mean.estimate <- mean(LSAT$GPA)
+gpa.sd.estimate <- sd(LSAT$GPA)
+cor.estimate <- cor(LSAT$LSAT, LSAT$GPA)
+
+mean.estimate <- c(lsat.mean.estimate, gpa.mean.estimate)
+cov.estimate <- matrix(c(lsat.sd.estimate^2, lsat.sd.estimate * gpa.sd.estimate * cor.estimate, lsat.sd.estimate * gpa.sd.estimate * cor.estimate, gpa.sd.estimate^2), 2)
+
+for (i in 1:B) {
+    lsat.bootstrap <- mvrnorm(dim(LSAT)[1], mean.estimate, cov.estimate)
+    cor.bootstrap[i] <- cor(lsat.bootstrap[, 1], lsat.bootstrap[, 2])
+}
+
+sd(cor.bootstrap)
+hist(cor.bootstrap)
+```
+
+(d) 
+
+(e)
+
+(f) A variance stabilizing transformation makes the variance of a random variable independent from its mean. For instance, this allows us to satisfy the homoscedasticity assumption for ANOVA.
+
+(g)
+
+2.  (a)
+    (b)
+    (c)
+    (d)
