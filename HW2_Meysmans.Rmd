@@ -14,6 +14,8 @@ data(LSAT)
 1.  (a)
 
 ```{r 1a}
+# The `cor` function calculates the Pearson sample correlation by default, the
+# method argument is unnecessary
 cor(LSAT$LSAT, LSAT$GPA)
 ```
 
@@ -46,7 +48,12 @@ gpa.sd.estimate <- sd(LSAT$GPA)
 cor.estimate <- cor(LSAT$LSAT, LSAT$GPA)
 
 mean.estimate <- c(lsat.mean.estimate, gpa.mean.estimate)
-cov.estimate <- matrix(c(lsat.sd.estimate^2, lsat.sd.estimate * gpa.sd.estimate * cor.estimate, lsat.sd.estimate * gpa.sd.estimate * cor.estimate, gpa.sd.estimate^2), 2)
+cov.estimate <- matrix(c(
+    lsat.sd.estimate^2,
+    lsat.sd.estimate * gpa.sd.estimate * cor.estimate,
+    lsat.sd.estimate * gpa.sd.estimate * cor.estimate,
+    gpa.sd.estimate^2
+), 2)
 
 for (i in 1:B) {
     lsat.bootstrap <- mvrnorm(dim(LSAT)[1], mean.estimate, cov.estimate)
@@ -57,15 +64,44 @@ sd(cor.bootstrap)
 hist(cor.bootstrap)
 ```
 
-(d) 
+(d) Assuming $\left(\text{LSAT},\text{GPA}\right)$ has a bivariate normal distribution
+
+$$\text{SE}_r=\sqrt{\frac{\left(1-\rho^2\right)^2}{n}}=\frac{1-\rho^2}{\sqrt{n}}$$
+
+When we fill in the sample correlation $r$ as an estimate for the correlation coefficient $\rho$ in the above formula, we obtain:
+
+```{r 1d}
+# The `cor` function calculates the Pearson sample correlation by default, the
+# method argument is unnecessary
+r <- cor(LSAT$LSAT, LSAT$GPA)
+(1 - r^2) / sqrt(dim(LSAT)[1])
+```
+
+The estimate is lower than both bootstrap estimates.
 
 (e)
 
-(f) A variance stabilizing transformation makes the variance of a random variable independent from its mean. For instance, this allows us to satisfy the homoscedasticity assumption for ANOVA.
+$$\sqrt{n}\left(\right)\xrightarrow{D}$$
+
+(f) A variance stabilizing transformation makes the variance of a random variable independent from its mean. This is useful to e.g. satisfy the homoscedasticity assumption for ANOVA.
 
 (g)
 
-2.  (a)
-    (b)
-    (c)
-    (d)
+2.  (a) Since we know the sum of $n$ i.i.d. Poisson random variables with parameters $\lambda_1,\ldots,\lambda_n$ is a Poisson random variable with parameter $\sum_{i=1}^n \lambda_i$ and that scaling a Poisson random variable scales its mean $\lambda$ by the same factor, the pivot $Q$ becomes:
+
+$$Q(\textbf{X},\lambda)=\frac{1}{\lambda}\sum_{i=1}^n X_i\sim\text{Poisson}(n)$$
+
+The equations for $a$ and $b$ then become:
+
+$$a$$
+
+$$b$$
+
+```{r}
+set.seed(12345)
+
+```
+
+(b)
+(c)
+(d)
