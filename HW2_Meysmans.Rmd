@@ -79,7 +79,11 @@ r <- cor(LSAT$LSAT, LSAT$GPA)
 
 The estimate is lower than both bootstrap estimates.
 
-(e)
+(e) Let $\text{artanh}$, i.e. Fisher's z-transformation, be the transformation $g$, $\rho$ the parameter $\theta$, and $r$ the estimator $W_n$ in the Delta method. To find the asymptotic variance after transformation, we first find $g'$:
+
+$$g'(\theta)$$
+
+$$\frac{\sqrt{n}}{2}\left(\log\left(\frac{1+r}{1-r}\right)-\log\left(\frac{1+\rho}{1-\rho}\right)\right)\xrightarrow{D}N\left(0,1\right)$$
 
 $$\sqrt{n}\left(\right)\xrightarrow{D}$$
 
