@@ -79,33 +79,87 @@ r <- cor(LSAT$LSAT, LSAT$GPA)
 
 The estimate is lower than both bootstrap estimates.
 
-(e) Let $\text{artanh}$, i.e. Fisher's z-transformation, be the transformation $g$, $\rho$ the parameter $\theta$, and $r$ the estimator $W_n$ in the Delta method. To find the asymptotic variance after transformation, we first find $g'$:
+(e) Let $\text{artanh}$ (i.e. Fisher's z-transformation) be the transformation $g$, $\rho$ be the parameter $\theta$, $\psi(\theta)$ be $1-\theta^2$, and $r$ be the sequence of estimators $W_n$ in the Delta method applied to a variance stabilizing transformation. To find the asymptotic variance after transformation, we first find the first derivative of $\text{artanh}$ in $\rho$:
 
-$$g'(\theta)$$
+$$\frac{d(\text{artanh}(\rho))}{d\rho}=\frac{1}{1-\rho^2}$$
+
+Since the first derivative exists everywhere except at $\rho\in\{1,-1\}$ and we know $\frac{1}{1-\rho^2}\neq0$, because $\rho\in[-1,1]$ and therefore $\rho^2\in[0,1]$, we meet the condition for the Delta method, except where we have maximal correlation (i.e. $\rho^2=1$).
+It provides us with the following asymptotic normality, because the variance $(1-\rho^2)^2$ and the square of the derivative $\frac{1}{(1-\rho^2)^2}$ cancel out:
 
 $$\frac{\sqrt{n}}{2}\left(\log\left(\frac{1+r}{1-r}\right)-\log\left(\frac{1+\rho}{1-\rho}\right)\right)\xrightarrow{D}N\left(0,1\right)$$
 
-$$\sqrt{n}\left(\right)\xrightarrow{D}$$
+(f) A variance stabilizing transformation makes the asymptotic variance of the transformed statistic independent of unknown parameters, thereby simplifying inference.
 
-(f) A variance stabilizing transformation makes the variance of a random variable independent from its mean. This is useful to e.g. satisfy the homoscedasticity assumption for ANOVA.
+(g) Both asymptotic normality and consistency of a sequence of estimators $W_n$ are equivalent to some instance of convergence of $W_n$ to a true parameter $\theta$.
+There exist two instances of consistency of $W_n$: weak consistency is convergence in probability of $W_n$ to $\theta$ and strong consistency is almost sure convergence of $W_n$ to $\theta$.
+Asymptotic normality is weaker than both instances of consistency, since it is convergence in distribution of $\sqrt{n}(W_n-\theta)$ to $N(0,\sigma^2)$ with $\sigma^2$ unknown.
 
-(g)
+2.  (a) We first find the cumulative distribution function $F_Y$ for $Y$.
+Since they are independent and share their parameter $\lambda$, $X_1,\ldots,X_n$ are i.i.d. and their sum $Y$ is again Poisson distributed, with parameter $n\lambda$.
+We note that $Y$ is a sufficient statistic for $\lambda$: given $X_1,\ldots,X_n$, its distribution does not depend on $\lambda$.
+This is why it can serve as the pivot $Q$.
+Given the observed value $y$ of $Y$, the lower tail and upper tail of the cumulative distribution function of $Y$ lead to the equations for a and b:
 
-2.  (a) Since we know the sum of $n$ i.i.d. Poisson random variables with parameters $\lambda_1,\ldots,\lambda_n$ is a Poisson random variable with parameter $\sum_{i=1}^n \lambda_i$ and that scaling a Poisson random variable scales its mean $\lambda$ by the same factor, the pivot $Q$ becomes:
+$$\sum_{k=0}^y e^{-n\lambda}\frac{n\lambda^k}{k!}=\frac{\alpha}{2}$$
+$$\sum_{k=y}^\infty e^{-n\lambda}\frac{n\lambda^k}{k!}=\frac{\alpha}{2}$$
 
-$$Q(\textbf{X},\lambda)=\frac{1}{\lambda}\sum_{i=1}^n X_i\sim\text{Poisson}(n)$$
+These equations are equivalent to the following probability statements:
 
-The equations for $a$ and $b$ then become:
+$$P(Y\leq y|\lambda)=\frac{\alpha}{2}$$
+$$P(Y\geq y|\lambda)=\frac{\alpha}{2}$$
 
-$$a$$
+Using the identity between a discretized gamma (Erlang) random variable and a Poisson random variable, these become:
 
-$$b$$
+$$P(\chi_{2(y+1)}^2>2n\lambda)=\frac{\alpha}{2}$$
+$$P(\chi_{2y}^2<2n\lambda)=\frac{\alpha}{2}$$
 
-```{r}
-set.seed(12345)
+Since a gamma random variable with parameters $\alpha=\frac{m}{2}$ (to be clear, not the confidence level $\alpha$) and $\beta=2$ is equivalent to a $\chi_m^2$ random variable.
+We now simultaneously solve both equations and obtain the two-sided $1-\alpha$ confidence interval for $\lambda$:
 
-```
+$$\left[\frac{\chi_{2y,\frac{1-\alpha}{2}}^2}{2n},\frac{\chi_{2(y+1),\frac{\alpha}{2}}^2}{2n}\right]$$
 
-(b)
-(c)
-(d)
+(b) Since $X_1,\ldots,X_n$ are i.i.d. and given the observed data $x_1,\ldots,x_n$, the log likelihood $l$ becomes:
+
+$$l(\lambda|x_1,\ldots,x_n)=-n\lambda+\log\left(\lambda\right)\sum_{i=1}^n x_i-\sum_{i=1}^n \log\left(x_i!\right)$$
+
+The partial derivative of $l$ in $\lambda$ then becomes:
+
+$$\frac{\partial l(\lambda)}{\partial\lambda}=-n+\frac{\sum_{i=1}^n x_i}{\lambda}$$
+
+This partial derivative equals $0$ when $\lambda=\hat{\lambda}_{\text{MLE}}=\bar{X}=\frac{\sum_{i=1}^n x_i}{n}$. To check whether this stationary point of $l$ is a maximum, we compute the second partial derivative of $l$ in $\lambda$:
+
+$$\frac{\partial^2 l(\lambda)}{\partial\lambda^2}=-\frac{\sum_{i=1}^n x_i}{\lambda^2}$$
+
+We then evaluate it at the stationary point $\hat{\lambda}_{\text{MLE}}$:
+
+$$-\frac{n^2}{\sum_{i=1}^n x_i}$$
+
+Since the observed data $x_1,\ldots,x_n$ for Poisson random variables $X_1,\ldots,X_n$ are always positive, this quantity is always negative, hence we have found a maximum of $l$ at $\hat{\lambda}_{\text{MLE}}$.
+Then, after considerable simplification, the logarithmic form of the likelihood ratio test statistic $T_{\text{LR}}$ becomes:
+
+$$T_{\text{LR}}\left(\boldsymbol{x}\right)=2n\left(\lambda_0+\log\left(\frac{\hat{\lambda}_{\text{MLE}}}{\lambda_0}\right)\hat{\lambda}_{\text{MLE}}-\hat{\lambda}_{\text{MLE}}\right)$$
+
+Since small values of $T_{\text{LR}}$ are evidence against $H_0$, the rejection region $R$ becomes:
+
+$$R=\left\{\boldsymbol{x}|T_{\text{LR}}\leq\xi\right\}$$
+
+We invert this region to obtain the confidence set $C$:
+
+$$C=\left\{\lambda|T_{\text{LR}}>\xi\right\}$$
+
+By Wilks' theorem and the difference in dimensionality between the unrestricted and restricted parameter spaces equal to 1, we know that under $H_0$, $T_{\text{LR}}\xrightarrow{D}\chi_1^2$.
+We conclude that asymptotically:
+
+$$C=\left\{\lambda|T_{\text{LR}}>\chi_{1,1-\alpha}^2\right\}$$
+
+This confidence set determines a one-sided $1-\alpha$ confidence interval for $\lambda$, different from the two-sided confidence interval we found in (a):
+
+$$\left[\chi_{1,1-\alpha}^2,\infty\right)$$
+
+(c) i.
+
+ii.
+
+iii.
+
+(d) 
